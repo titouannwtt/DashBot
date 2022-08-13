@@ -1,16 +1,30 @@
 import json
 import configparser
 import pandas as pd
-import telegram_send
+
+try :
+    import telegram_send
+    useTg=True
+except : 
+    useTg=False
+    print('Les notifications telegrams ne seront pas utilisées')
 import ccxt
 import os. path
 import pandas as pd
 import numpy as np
+import datetime
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 
 #Cet import + le code suivant permettent d'éviter les warnings dans les logs
 import warnings; warnings.simplefilter('ignore')
+
+dashBot_version = 2.01
+
+message=" "
+def addMessageComponent(string):
+    global message
+    message=message+"\n"+string
 
 def load_graph(symbol):
     global ax
@@ -191,8 +205,37 @@ plt.legend(prop={'size': 20})
 ax.set_xticks(x[::int(4000/figL)])
 ax.set_xticklabels(x[::int(4000/figL)], rotation=45)
 ax.grid(axis='y')
+
 try :
     plt.savefig(f"{path}soldes_global.pdf", dpi=1000)
     print(f"Fichier {path}soldes_global.pdf créé.")
 except Exception as err :
     print(f"Détails : {err}")
+    
+if useTg==True :
+    date = datetime.datetime.now()
+    addMessageComponent(f"{date}\nDASHBOARD BOTS (DashBot) - v{dashBot_version}")
+    addMessageComponent("===================\n")
+    for bot in botList :
+        addMessageComponent(f" • {botList[bot]['name']} :")
+        addMessageComponent(f"   - investissement : {round(botList[bot]['solde']['totalInvestment'],3)}$")
+        addMessageComponent(f"   - solde : {round(botList[bot]['solde']['currentSolde'],3)}$")
+        performance=round(botList[bot]['solde']['performance'],3)
+        if performance>0 :
+            performance="+"+str(performance)
+        addMessageComponent(f"   - performance : {performance}%\n")
+    addMessageComponent("===================\n")
+    addMessageComponent(f"Investissement total : {round(initialInv,3)}$")
+    addMessageComponent(f"Solde total : {round(globalSolde[-1],3)}$")
+    performance = round((float(globalSolde[-1])-float(initialInv))/float(globalSolde[-1])*100, 3)
+    if performance>0 :
+        performance="+"+str(performance)
+    addMessageComponent(f"Performance totale : {performance}% (+{round(globalSolde[-1]-initialInv,2)}$)")
+    f=open(path+'soldes_global.pdf', "rb")
+    f2=open(path+'soldes_par_bots.pdf', "rb")
+    try :
+        telegram_send.send(messages=[message], files=[f, f2])
+        print('Notification telegram envoyée :')
+        print(message)
+    except Exception as err :
+        print(f'Erreur lors de l\'envoie de la notification Telegram : {err}')
