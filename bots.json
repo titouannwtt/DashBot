@@ -1,50 +1,74 @@
 {
-      "BOT-MIRACLE": {
-            "name": "BOT-MIRACLE",
-            "version": 20.01,
-            "paths": {
-                  "path": "/home/moutonneux/bots/bot-miracle/",
-                  "solde_file": "/home/moutonneux/bots/bot-miracle/data/historiques-soldes.dat",
-                  "config_file": "/home/moutonneux/bots/bot-miracle/config-bot.cfg",
-                  "bot_file": "/home/moutonneux/bots/bot-miracle/config-bot.cfg"
-            },
+    "BOT-MIRACLE": {
+        "name": "BOT-MIRACLE",
+        "version": 20.01,
+        "apiKey": "4xB-lEQ0-c2CBQPVJuoQZULu8BAXCtOJkeU82xhi",
+        "paths": {
+            "path": "/home/moutonneux/bots/bot-miracle/",
+            "solde_file": "/home/moutonneux/bots/bot-miracle/data/historiques-soldes.dat",
+            "config_file": "/home/moutonneux/bots/bot-miracle/config-bot.cfg",
+            "bot_file": "/home/moutonneux/bots/bot-miracle/config-bot.cfg"
+        },
+        "solde": {
             "totalInvestment": 101.3,
-            "currentSolde": 101.38398528
-      },
-      "BOT-VP1": {
-            "name": "BOT-VP1",
-            "version": 1.0,
-            "paths": {
-                  "path": "/home/moutonneux/bots/bot-vp1/",
-                  "solde_file": "/home/moutonneux/bots/bot-vp1/data/historiques-soldes.dat",
-                  "config_file": "/home/moutonneux/bots/bot-vp1/config-bot.cfg",
-                  "bot_file": "/home/moutonneux/bots/bot-vp1/bot_vp1.py"
-            },
+            "currentSolde": 103.9726332,
+            "performance": 2.571
+        },
+        "timeframe": "1h",
+        "levier": "2"
+    },
+    "BOT-VP1": {
+        "name": "BOT-VP1",
+        "version": 1.0,
+        "apiKey": "zPs8lEApfCYy57612k_OnpKNFkoXgTTBdpBnFuhK",
+        "paths": {
+            "path": "/home/moutonneux/bots/bot-vp1/",
+            "solde_file": "/home/moutonneux/bots/bot-vp1/data/historiques-soldes.dat",
+            "config_file": "/home/moutonneux/bots/bot-vp1/config-bot.cfg",
+            "bot_file": "/home/moutonneux/bots/bot-vp1/bot_vp1.py"
+        },
+        "solde": {
             "totalInvestment": 55.0,
-            "currentSolde": 70.15909797
-      },
-      "BOT-MIRACLE-MONO": {
-            "name": "BOT-MIRACLE-MONO",
-            "version": 20.01,
-            "paths": {
-                  "path": "/home/moutonneux/bots/bot-miracle-mono/",
-                  "solde_file": "/home/moutonneux/bots/bot-miracle-mono/data/historiques-soldes.dat",
-                  "config_file": "/home/moutonneux/bots/bot-miracle-mono/config-bot.cfg",
-                  "bot_file": "/home/moutonneux/bots/bot-miracle-mono/config-bot.cfg"
-            },
+            "currentSolde": 70.39723602,
+            "performance": 21.872
+        },
+        "timeframe": "1h",
+        "levier": "2"
+    },
+    "BOT-MIRACLE-MONO": {
+        "name": "BOT-MIRACLE-MONO",
+        "version": 20.01,
+        "apiKey": "lfVDP_IAugr5eg2fOD8pZwJhafA1Cpx1DPp82Wih",
+        "paths": {
+            "path": "/home/moutonneux/bots/bot-miracle-mono/",
+            "solde_file": "/home/moutonneux/bots/bot-miracle-mono/data/historiques-soldes.dat",
+            "config_file": "/home/moutonneux/bots/bot-miracle-mono/config-bot.cfg",
+            "bot_file": "/home/moutonneux/bots/bot-miracle-mono/config-bot.cfg"
+        },
+        "solde": {
             "totalInvestment": 164.6,
-            "currentSolde": 185.14690895
-      },
-      "BOT-SUPER-REVERSAL": {
-            "name": "BOT-SUPER-REVERSAL",
-            "version": 2.01,
-            "paths": {
-                  "path": "/home/moutonneux/bots/bot-superreversal/",
-                  "solde_file": "/home/moutonneux/bots/bot-superreversal/data/historiques-soldes.dat",
-                  "config_file": "/home/moutonneux/bots/bot-superreversal/config-bot.cfg",
-                  "bot_file": "/home/moutonneux/bots/bot-superreversal/bot_superreversal.py"
-            },
+            "currentSolde": 191.29861802,
+            "performance": 13.957
+        },
+        "timeframe": "1h",
+        "levier": "2"
+    },
+    "BOT-SUPER-REVERSAL": {
+        "name": "BOT-SUPER-REVERSAL",
+        "version": 2.01,
+        "apiKey": "PXjyXwye0DaumCtNal2E3VBsZJ2vOXpX6lPCXI_O",
+        "paths": {
+            "path": "/home/moutonneux/bots/bot-superreversal/",
+            "solde_file": "/home/moutonneux/bots/bot-superreversal/data/historiques-soldes.dat",
+            "config_file": "/home/moutonneux/bots/bot-superreversal/config-bot.cfg",
+            "bot_file": "/home/moutonneux/bots/bot-superreversal/bot_superreversal.py"
+        },
+        "solde": {
             "totalInvestment": 73.0,
-            "currentSolde": 111.36250688
-      }
+            "currentSolde": 116.52717265,
+            "performance": 37.354
+        },
+        "timeframe": "1h",
+        "levier": "2"
+    }
 }

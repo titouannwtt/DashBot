@@ -12,8 +12,36 @@ from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 #Cet import + le code suivant permettent d'éviter les warnings dans les logs
 import warnings; warnings.simplefilter('ignore')
 
-def getDataBTC() :
-    result = pd.DataFrame(ccxt.ftx().fetch_ohlcv(symbol="BTC/USD", timeframe="1h", limit=5000))
+def load_graph(symbol):
+    global ax
+    global plt
+    data=getData(symbol)
+    data=data[len(data)-len(x):]['close']
+    price_series = pd.Series(data)
+    evolution=[]
+    for i in price_series.pct_change() :
+        if len(evolution)==0 :   
+            evolution.append(initialInv)
+        else :
+            evolution.append(evolution[-1]*i+evolution[-1])
+
+    ind = np.argmin(data)
+    evolution2=[]
+    j=0
+    for i in price_series.pct_change() :
+        if j<ind :
+            evolution2.append(0.0)
+        else :
+            if len(evolution2)==0 or evolution2[-1]==0.0 :   
+                evolution2.append(initialInv)
+            else :
+                evolution2.append(evolution2[-1]*i+evolution2[-1])
+        j+=1
+    ax.plot(x, evolution, label=f'Solde si vous aviez investi {initialInv}$ sur {symbol.split("/")[0]} au moment où vous avez lancé votre bot le {x[0].split(" ")[0]}')
+    ax.plot(x, evolution2, label=f'Solde si vous aviez investi {initialInv}$ sur {symbol.split("/")[0]} au meilleur moment le {x[ind].split(" ")[0]}')
+
+def getData(symbol) :
+    result = pd.DataFrame(ccxt.ftx().fetch_ohlcv(symbol=symbol, timeframe="1h", limit=5000))
     result = result.rename(columns={0: 'timestamp', 1: 'open', 2: 'high', 3: 'low', 4: 'close', 5: 'volume'})
     result = result.set_index(result['timestamp'])
     result.index = pd.to_datetime(result.index, unit='ms')
@@ -42,32 +70,40 @@ globalSolde=[]
 #On récupérè les informations spécifiques à chaque bots à partir du repertoire
 for botPath in botPathList :
     botDict={}
-    files = os.listdir(botPath)
-    for file in files :
-        if ("bot_" in file or "bot" in file) and ("config-bot.cfg" not in file or "cBot_perp_ftx.py" not in file):
-            bot_file_name=file
-            with open(botPath+bot_file_name, "r+") as f:
-                for line in f:
-                    if "botname" in line :
-                        botname=str(line.split("=")[1].split('"')[1])
-                    if "version" in line :
-                        version=float(line.split("=")[1].split('"')[1])
-                        break
-                        
-    config = configparser.ConfigParser()
-    config.read(botPath+'config-bot.cfg')
-    with open(botPath+'/data/'+'historiques-soldes.dat', 'r') as f:
-        data = f.readlines()[-1].split()
-        solde=float(data[5])
-    #On sauvegarde le chemin vers le repertoire du bot
-    botDict['name'] = botname
-    botDict['version'] = version
-    botDict['paths'] = { 'path': botPath, 'solde_file': botPath+'data/'+'historiques-soldes.dat', 'config_file': botPath+'config-bot.cfg', 'bot_file': botPath+bot_file_name}
-    botDict['totalInvestment'] = float(config['SOLDE']['totalInvestment'])
-    initialInv=initialInv+float(botDict['totalInvestment'])
-    botDict['currentSolde'] = float(solde)
-    botList[botDict['name']]=botDict
-    print(f'{botname} traité.')
+    try :
+        files = os.listdir(botPath)
+        for file in files :
+            if ("bot_" in file or "bot" in file) and ("config-bot.cfg" not in file or "cBot_perp_ftx.py" not in file):
+                bot_file_name=file
+                with open(botPath+bot_file_name, "r+") as f:
+                    for line in f:
+                        if "botname" in line :
+                            botname=str(line.split("=")[1].split('"')[1])
+                        if "version" in line :
+                            version=float(line.split("=")[1].split('"')[1])
+                            break
+                            
+        config = configparser.ConfigParser()
+        config.read(botPath+'config-bot.cfg')
+        with open(botPath+'/data/'+'historiques-soldes.dat', 'r') as f:
+            data = f.readlines()[-1].split()
+            solde=float(data[5])
+        #On sauvegarde le chemin vers le repertoire du bot
+        botDict['name'] = botname
+        botDict['version'] = version
+        botDict['apiKey'] = str(config['FTX.AUTHENTIFICATION']['apiKey'])
+        botDict['paths'] = { 'path': botPath, 'solde_file': botPath+'data/'+'historiques-soldes.dat', 'config_file': botPath+'config-bot.cfg', 'bot_file': botPath+bot_file_name}
+        performance = round((float(solde)-float(config['SOLDE']['totalInvestment']))/float(solde)*100, 3)
+        if performance>0.0 :
+            performance=float("+"+str(performance))
+        botDict['solde'] = { 'totalInvestment' : float(config['SOLDE']['totalInvestment']), 'currentSolde' : float(solde), 'performance' : performance}
+        botDict['timeframe'] = str(config['STRATEGIE']['timeframe'])
+        botDict['levier'] = str(config['STRATEGIE']['defaultLeverage'])
+        initialInv=initialInv+float(config['SOLDE']['totalInvestment'])
+        botList[botDict['name']]=botDict
+        print(f'{botname} traité.')
+    except Exception as err :
+        print(f"Impossible de traiter {botname} : {err}")
     
     #Génération du fichier avec les soldes
     if botPathList[0]==botPath :
@@ -124,7 +160,7 @@ except Exception as err :
 
 try :
     jsonFile = open(f"{path}bots.json", "w", encoding ='utf8')
-    json.dump(botList, jsonFile, indent = 6)
+    json.dump(botList, jsonFile, indent = 4)
     jsonFile.close()
     print(f"Fichier {path}bots.json créé.")
 except : 
@@ -137,32 +173,21 @@ fig.set_figwidth(figL)
 plt.title('Solde global de tous les bots')
 plt.xlabel("Date", fontsize=20)
 plt.ylabel("Solde", fontsize=20)
-btc=getDataBTC()
-btc=btc[len(btc)-len(x):]['close']
-price_series = pd.Series(btc)
-evolution=[]
-for i in price_series.pct_change() :
-    if len(evolution)==0 :   
-        evolution.append(initialInv)
-    else :
-        evolution.append(evolution[-1]*i+evolution[-1])
 
-ind = np.argmin(btc)
-evolution2=[]
-j=0
-for i in price_series.pct_change() :
-    if j<ind :
-        evolution2.append(0.0)
-    else :
-        if len(evolution2)==0 or evolution2[-1]==0.0 :   
-            evolution2.append(initialInv)
-        else :
-            evolution2.append(evolution2[-1]*i+evolution2[-1])
-    j+=1
+
+
+evolution3=[]
+for i in x :
+    evolution3.append(initialInv)
 ax.plot(x, globalSolde, label=f'Solde de tous les bots pour un investissement total de {initialInv}$')
-ax.plot(x, evolution, label=f'Votre solde si vous aviez investi {initialInv}$ sur le BTC au moment où vous avez lancé votre bot le {x[0].split(" ")[0]}')
-ax.plot(x, evolution2, label=f'Votre solde si vous aviez investi {initialInv}$ sur le BTC au meilleur moment le {x[ind].split(" ")[0]}')
-plt.legend(prop={'size': 30})
+ax.plot(x, evolution3, label=f'Solde si vous n\'aviez jamais investi et que vous aviez gardé vos {initialInv}$')
+
+
+load_graph("BTC/USD")
+#load_graph("ETH/USD")
+#load_graph("SOL/USD")
+
+plt.legend(prop={'size': 20})
 ax.set_xticks(x[::int(4000/figL)])
 ax.set_xticklabels(x[::int(4000/figL)], rotation=45)
 ax.grid(axis='y')
