@@ -6,7 +6,7 @@ Si telegram_send est configuré, une notification telegram est envoyée, résuma
 
 ![image](https://user-images.githubusercontent.com/63909350/184511258-e0ae46e4-f7f0-4ffa-91c3-75779b30a845.png)
 
-Un exemple de contenue des fichiers pdfs :
+Un exemple de contenu au sein des fichiers pdfs :
 ![image](https://user-images.githubusercontent.com/63909350/184499464-a207587b-3f4f-446e-8be0-f6b62ece04f7.png)
 
 ![image](https://user-images.githubusercontent.com/63909350/184499467-f76c50a8-b2e4-4715-95ca-79f1d85f4b2a.png)
