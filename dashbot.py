@@ -73,7 +73,7 @@ for botPath in botPathList :
     try :
         files = os.listdir(botPath)
         for file in files :
-            if ("bot_" in file or "bot" in file) and ("config-bot.cfg" not in file or "cBot_perp_ftx.py" not in file):
+            if ("bot_" in file or "bot" in file) and ("config-bot.cfg" != file and "cBot_perp_ftx.py" != file):
                 bot_file_name=file
                 with open(botPath+bot_file_name, "r+") as f:
                     for line in f:
