@@ -72,7 +72,9 @@ botPathList = [
             '/home/moutonneux/bots/bot-miracle/',
             '/home/moutonneux/bots/bot-vp1/',
             '/home/moutonneux/bots/bot-miracle-mono/',
-            '/home/moutonneux/bots/bot-superreversal/'
+            '/home/moutonneux/bots/bot-superreversal/',
+            '/home/moutonneux/bots/bot-superreversal-duo/',
+            '/home/moutonneux/bots/bot-trend-tracker/'
             ]
 
 botList = {}
@@ -107,7 +109,7 @@ for botPath in botPathList :
         botDict['version'] = version
         botDict['apiKey'] = str(config['FTX.AUTHENTIFICATION']['apiKey'])
         botDict['paths'] = { 'path': botPath, 'solde_file': botPath+'data/'+'historiques-soldes.dat', 'config_file': botPath+'config-bot.cfg', 'bot_file': botPath+bot_file_name}
-        performance = round((float(solde)-float(config['SOLDE']['totalInvestment']))/float(solde)*100, 3)
+        performance = round((float(solde)-float(config['SOLDE']['totalInvestment']))/float(config['SOLDE']['totalInvestment'])*100, 3)
         if performance>0.0 :
             performance=float("+"+str(performance))
         botDict['solde'] = { 'totalInvestment' : float(config['SOLDE']['totalInvestment']), 'currentSolde' : float(solde), 'performance' : performance}
@@ -130,18 +132,22 @@ for botPath in botPathList :
                 if "#" in line:
                     continue
                 data = line.split()
+                if botDict['timeframe']=='15m' :
+                    i+=1
                 jour=int(data[0])
                 mois=int(data[1])
                 annee=int(data[2])
                 heure=int(data[3])
                 minutes=int(data[4])
                 solde=float(data[5])
-                if botPathList[0]==botPath :
-                    x.append(f"{jour}-{mois}-{annee} {heure}:{minutes}")
-                y.append(solde)
-                i+=1
-    except :
+                if (i==4 and botDict['timeframe']=='15m') or botDict['timeframe']!='15m' :
+                    i=0
+                    if botPathList[0]==botPath :
+                        x.append(f"{jour}-{mois}-{annee} {heure}:{minutes}")
+                    y.append(solde)
+    except Exception as err :
         print(f"WARNING : Le fichier {botPath}+'/data/'+'historiques-soldes.dat' est introuvable.")
+        print(err)
     if len(x)!=len(y) :
         newY=[]
         if len(x)>len(y) :
@@ -227,7 +233,7 @@ if useTg==True :
     addMessageComponent("===================\n")
     addMessageComponent(f"Investissement total : {round(initialInv,3)}$")
     addMessageComponent(f"Solde total : {round(globalSolde[-1],3)}$")
-    performance = round((float(globalSolde[-1])-float(initialInv))/float(globalSolde[-1])*100, 3)
+    performance = round((float(globalSolde[-1])-float(initialInv))/float(initialInv)*100, 3)
     if performance>0 :
         performance="+"+str(performance)
     addMessageComponent(f"Performance totale : {performance}% (+{round(globalSolde[-1]-initialInv,2)}$)")
